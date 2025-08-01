@@ -73,7 +73,7 @@ $ export ICON_BUILD_DIR=$ICON_WORK_DIR/builds
 
 ### 1.3 Setup SSH e Chiavi di Accesso
 
-From: [icon_for_new_developers](https://www.cosmo-model.org/content/support/icon/icon_for_nwp_developers.pdf)
+From: [Icon for new developers](https://www.cosmo-model.org/content/support/icon/icon_for_nwp_developers.pdf)
 Per accedere ai repository ICON su [GitLab DKRZ](https://gitlab.dkrz.de/), you have to register a SSH key in your
 GitLab profile, per configurare correttamente le chiavi SSH.
 The procedure is described in the [GitLab README](https://docs.gitlab.com/user/ssh/) and the key commands
@@ -147,8 +147,8 @@ $ module avail
 ---
 
 ## 2. Gestione Dipendenze e Librerie (DA VERIFICARE)
-From "ICON indofrm.docx", cap:"Compilazion Icon su Cineca" by eminguzzi@arpae.it
-[ICON indofrm.docx](https://docs.google.com/document/d/1EUSS5lHaqZmkv0PiUGr1d75ei0EuMAR_/edit)
+From "ICON indofrm.docx", cap:"Compilazion Icon su Cineca" by eminguz
+[ICON inform](https://docs.google.com/document/d/1EUSS5lHaqZmkv0PiUGr1d75ei0EuMAR_/edit)
 ### 2.1 Introduzione a SPACK (Build System)
 **NOTA IMPORTANTE: SPACK è OPZIONALE per l'installazione di ICON su G100.**
 La maggior parte degli utenti dovrebbe utilizzare i moduli precompilati del cluster (sezione 2.2) che sono
@@ -169,7 +169,7 @@ I pacchetti vengono scaricati dai repository remoti e installati in una dir spec
 In "opt" ci sono i pacchetti installati; se ripeto l'installazione, Spack riconosce i pacchetti già installati e compilati e, se la configurazione richiesta non è cambiata, non li ri-compila.
 SPACK gestisce sia i singoli pacchetti che i moduli, permette di insallare e mantenere build diversi dello stesso pacchetto, permette di creare environment dedicati contenenti i pacchetti richiesti.
 
-Sono presenti delle opzioni, le "variances", che possono essere abilitate volta per volta per personalizzare la configurazione dei pacchetti. Le sintassi '*','%','^' ... servono a specificare queste opzioni (e.g: @ specifica la versione, %specifica il compilatore, + aggiunge opzione,...). Per ulteriori specifiche, seguire la documentazione disponibile su [Da aggiungere documentazione](). Per i comandi vedi [ICON indofrm.docx](https://docs.google.com/document/d/1EUSS5lHaqZmkv0PiUGr1d75ei0EuMAR_/edit)
+Sono presenti delle opzioni, le "variances", che possono essere abilitate volta per volta per personalizzare la configurazione dei pacchetti. Le sintassi '*','%','^' ... servono a specificare queste opzioni (e.g: @ specifica la versione, %specifica il compilatore, + aggiunge opzione,...). Per ulteriori specifiche, seguire la documentazione disponibile su [Da aggiungere documentazione](). Per i comandi vedi [ICON inform](https://docs.google.com/document/d/1EUSS5lHaqZmkv0PiUGr1d75ei0EuMAR_/edit)
 
 **Caratteristiche Principali di SPACK:**
 - Gestione automatica delle dipendenze
