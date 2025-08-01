@@ -208,3 +208,147 @@ $module load spack
 # Verifica compilatori disponibili
 $spack compilers
 ```
+
+**Comandi SPACK Fondamentali(NON TESTATO):**
+```bash
+# Ricerca pacchetti
+spack list hdf5
+spack info hdf5
+
+# Gestione ambienti
+spack env create icon-env
+spack env activate icon-env
+```
+
+### 2.2 Configurazione Moduli Software su G100
+
+I moduli sono gruppi di istruzioni che modificano l’ambiente shell per rendere fruibile un pacchetto software. Assegnano o integrano un insieme di variabili d'ambiente, tra cui $PATH, $LD_LIBRARY_PATH, etc.
+Dal 2021 i moduli sono raggruppati in “profili”: di default ne sono disponibili solo alcuni, per gli altri bisogna prima caricare il relativo profilo. Di default viene caricato solo il profilo “base”; per ICON serve (almeno) anche il profilo “advanced”: module load profile/advanced
+Per visualizzare tutti i profili disponibili: modmap -all. Vedi anche: modmap --help
+
+module avail package: elenco delle versioni disponibili per il modulo package. Il comando restituisce anche il path assoluto del “module file”.
+module list: elenco dei moduli attualmente caricati; <aL>=auto-loaded, <L>=loaded
+module load, module switch: carica o sostituisce un modulo
+module clear: cancella le assegnazioni di tutti i moduli caricati
+
+
+Il sistema G100 fornisce moduli precompilati ottimizzati per l'architettura del cluster. La corretta selezione e compatibilità dei moduli è fondamentale per il successo della compilazione: i diversi moduli usati devono essere stati creati con lo stesso compilator
+
+**Principi di Compatibilità Moduli:**
+- Tutti i moduli usati devono essere stati compilati con lo stesso compilatore
+- Non è possibile mescolare moduli scalari e paralleli (MPI)
+- Le versioni delle librerie devono essere coerenti tra loro
+
+L'ultimo principio è importante perché alcune librerie sono state compilate anche in locale da SIMC (con il compilatore intel) e possono essere chiamate senza usare moduli. Si trovano in /g100_work/smr_prod/srcintel, documentazione in [Documentazione_SIMC_Compilazione_grib_api_etc](https://docs.google.com/document/d/1L9oTAeGiYE_Yqp4A5XAYwLj7XjaPWZ0PrytsPG_VDQw)
+Devo prima caricare i moduli richiesti e esportare le variabili che puntino ai compilatori caricati.
+
+
+Per verificare i module available usa il comando (e.g. xxxx==intel) 
+$ module avail 2>&1 | grep xxxx
+**Set di Moduli Usati (2025/08/01):**
+```bash
+# Setup compilatori Intel OneAPI
+$ module load intel/oneapi-2021--binary
+$ module load intelmpi/oneapi-2021--binary
+
+# Librerie I/O (al momento non MPI)
+$ module load hdf5/1.10.7--oneapi--2021.2.0-ifort
+$ module load netcdf-c/4.8.1--intel--2021.4.0
+$ module load netcdf-fortran/4.5.3--intel--2021.4.0
+
+# Compressione e codifica
+$ module load szip/2.1.1--oneapi--2021.2.0-ifort
+$ module load eccodes/2.21.0--intelmpi--oneapi-2021--binary
+ERROR: Unable to locate a modulefile for 'eccodes/2.21.0--intelmpi--oneapi-2021--binary'
+# Giusto perchè non ho MPI al momento
+$ module load eccodes/2.21.0--intel--2021.4.0
+# Librerie matematiche
+$ module load mkl/oneapi-2021--binary
+
+```
+
+
+
+**Set di Moduli Alternativi (GNU Compiler)(NON TESTATO):**
+```bash
+# Setup compilatori GNU
+module load gcc/10.2.0
+module load openmpi/4.1.1--gcc--10.2.0
+
+# Librerie I/O
+module load hdf5/1.10.7--gcc--10.2.0
+module load netcdf/4.7.4--gcc--10.2.0
+module load netcdff/4.5.3--gcc--10.2.0
+
+# Codifica GRIB
+module load eccodes/2.21.0--gcc--10.2.0
+```
+
+### 2.3 Librerie Richieste
+From: [ICON Tutorial 2024]()
+Spiegazione dei moduli appena caricati.
+ICON richiede diverse librerie specializzate per l'I/O scientifico e la gestione di formati dati meteorologici.
+
+**NetCDF (Network Common Data Form):**
+NetCDF è essenziale per l'I/O di dati scientifici multidimensionali e la definizione della topologia di griglia. Serve infatti per salvare i dati di output o leggere quelli di imput
+
+Caratteristiche:
+- Formato autodescrittivo con metadati completi
+- Supporto per array multidimensionali
+- Compatibilità con HDF5 per file di grandi dimensioni
+- Interfacce C e Fortran
+
+Inoltre, è importante che NetCDF lavori in parallelo. Se ogni processo scrivesse su un file separato o attendesse il proprio turno per scrivere (lettura/scrittura) seriale, sarebbe inefficiente e lento.
+
+Il supporto MPI-IO permette a più processi contemporaneamente di leggere/scrivere sullo stesso file NetCDF in modo coordinato. Questo si chiama I/O parallelo.
+
+(COME SCARICARLA? CHIEDO PRIMA CONFERMA A DAVIDE)
+
+**HDF5 (Hierarchical Data Format 5)(DA SISTEMARE):**
+Formato di file gerarchico per dati scientifici di grandi dimensioni.
+
+Configurazione specifica:
+- Deve supportare I/O parallelo per prestazioni ottimali
+- Compatibilità con NetCDF-4
+- Supporto per compressione dati
+
+**ecCodes (ECMWF Coding/Decoding):**
+Libreria ECMWF per la codifica/decodifica di formati GRIB1/2. Quindi serve a leggere/scrivere i file GRIB.
+
+Se ecCodes supporta MPI-IO, più processi possono accedere contemporaneamente allo stesso file GRIB in modo coordinato e efficiente. Questo è importante quando i file GRIB sono grandi e devono essere letti/scritti da molti processi contemporaneamente: per esempio, nella fase di post-processing parallelo o durante l’output simultaneo da più processi.
+
+Se il workflow di ICON usa GRIB principalmente in modo seriale o solo da pochi processi, ecCodes senza MPI potrebbe bastare.
+Se invece è previsto un I/O parallelo intensivo su GRIB, conviene la versione MPI-aware. 
+Per la maggior parte degli usi (come preprocessing GRIB per ICON), la versione seriale è sufficiente.
+
+All'interno di icon è già presente ecCodes ma senza MIP. Per verificarlo:
+```bash
+# Cerco i moduli di ecCodes
+$ grep -i eccodes
+eccodes/2.21.0--gcc--10.2.0(default)         ncview/2.1.8--oneapi--2021.2.0-ifort                                     
+eccodes/2.21.0--intel--2021.4.0              ninja/1.11.1 
+
+# Carico il modulo della versione intel e verifico se è stato compilato con supporto MPI
+$ module load eccodes/2.21.0--intel--2021.4.0
+$ ldd $(which grib_ls) | grep mpi
+
+# Se non trovo riferimenti a libmpi o libmpiifort, è seriale. (è non li trovo)
+
+```
+
+Se vuoi scaricare la versione MPI (NON CREDO CHE QUESTO QUA SOTTO BASTI!)
+Installazione e configurazione:
+```bash
+# Download da ECMWF
+wget https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.21.0-Source.tar.gz
+
+# Configurazione build
+./configure --prefix=/path/to/install \
+            --disable-jpeg \
+            --enable-shared=no \
+            --enable-fortran
+
+# Compilazione
+make -j8
+make install
+```
