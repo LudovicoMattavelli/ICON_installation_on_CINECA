@@ -87,24 +87,20 @@ $ .ssh/
  -bash: .ssh/: No such file or directory
 
 # Generazione chiave con passphrase per sicurezza
-# Generate a ED25519 ssh key. Follow the README. For security reasons your ssh
-keys should be secured with a passphrase. E.g.:
+# Generate a ED25519 ssh key. Follow the README. For security reasons your ssh keys should be secured with a passphrase. E.g.:
 $ ssh-keygen -t ed25519 -f "$HOME/.ssh/id_ed25519_gitlab.dkrz.de"
 Enter passphrase (empty for no passphrase): 
 
 # Configurazione ssh-agent per gestione passphrase
 $ eval "$(ssh-agent -s)"
 
-#You can setup and configure ssh-agent on your machine in order to unlock your ssh
-passphrases just once per computer session
+#You can setup and configure ssh-agent on your machine in order to unlock your ssh passphrases just once per computer session
 $ ssh-add ~/.ssh/id_ed25519_gitlab.dkrz.de
 ```
 
 **Configurazione SSH Config:**
 ```bash
-#It is possible to use different ssh keys for different services. This becomes handy for
-services with short expire limits. As a starting point, connect your ssh key and the
-gitlab.dkrz.de in your ~/.ssh/config as follows.
+#It is possible to use different ssh keys for different services. This becomes handy for services with short expire limits. As a starting point, connect your ssh key and the gitlab.dkrz.de in your ~/.ssh/config as follows.
 # Aggiunta configurazione a ~/.ssh/config
 $ cat >> ~/.ssh/config << EOF
 
@@ -117,8 +113,7 @@ $ EOF
 
 **Registrazione Chiave su GitLab:**
 ```bash
-# After creating the ssh key, you have to copy-paste the content of the new *.pub file
-to the SSH settings in GitLab.
+# After creating the ssh key, you have to copy-paste the content of the new *.pub file to the SSH settings in GitLab.
 # Visualizzazione chiave pubblica
 $ cat "$HOME/.ssh/id_ed25519_gitlab.dkrz.de.pub"
 
