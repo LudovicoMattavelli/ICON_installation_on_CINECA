@@ -4,14 +4,8 @@
 
 1. [Prerequisiti e Preparazione Ambiente](#1-prerequisiti-e-preparazione-ambiente)
 2. [Gestione Dipendenze e Librerie](#2-gestione-dipendenze-e-librerie)
-3. [Setup Repository e Codice Sorgente](#3-setup-repository-e-codice-sorgente)
-4. [Configurazione Ambiente di Build](#4-configurazione-ambiente-di-build)
-5. [Compilazione ICONTOOLS](#5-compilazione-icontools)
-6. [Compilazione ICON Principale](#6-compilazione-icon-principale)
-7. [Configurazione Post-Installazione](#7-configurazione-post-installazione)
-8. [Troubleshooting e Manutenzione](#8-troubleshooting-e-manutenzione)
-9. [Casi Speciali e Configurazioni Avanzate](#9-casi-speciali-e-configurazioni-avanzate)
-10. [Appendici Tecniche](#10-appendici-tecniche)
+3. [Compilazione Icon](#3-compilazione-icon)
+
 
 ---
 
@@ -334,3 +328,34 @@ $ ldd $(which grib_ls) | grep mpi
 
 # Se non trovo riferimenti a libmpi o libmpiifort, è seriale.
 ```
+## 3. Compilazione ICON
+Clonare l’intero repository, senza specificare il branch, in modo da avere tutta la struttura completa:
+```
+git clone --recursive git@gitlab.dkrz.de:icon/icon-nwp.git
+cd icon-nwp
+git checkout nome-branch
+```
+Questo garantisce che: tutti i riferimenti ai branch remoti siano disponibili, i submodule siano scaricabili correttamente e che il checkout sul branch avvenga senza problemi di storia parziale (che può succedere con --depth 1).
+
+A questo punto:
+```
+# Aggiorna i submodule
+git submodule update --init --recursive
+
+# Verifica dove ti trovi e su che branch sei:
+git branch
+```
+Controlla che la struttura sia corretta per la build, es. cartelle come src/, externals/, ecc
+
+Restando nella cartella icon-nwp, devo ora inserire due scrpit all'interno del file prima di poterlo compliare:
+- galileo.intel.cdfScalar o .. : uno script di compilazione SIMC
+- module_switcher: uno script ...
+Questi due files vanno copiati nella subdir "config/cineca", che dovrebbe già essere presente e contenente alcuni files (e.g.:
+```
+$ mkdir -p config/cineca
+# Eseguo il primo script
+$ ./config/cineca/galileo...
+# Compilo (il semplice make sarebbe lentissimo)
+$ make -j 8
+```
+A questo punto si troverà l’eseguibile icon è nella subdir bin.
