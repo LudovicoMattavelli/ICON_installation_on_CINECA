@@ -348,9 +348,10 @@ git branch
 Controlla che la struttura sia corretta per la build, es. cartelle come src/, externals/, ecc
 
 Restando nella cartella icon-nwp, devo ora inserire due scrpit all'interno del file prima di poterlo compliare:
-- galileo.intel.cdfScalar o .. : uno script di compilazione SIMC
+- galileo.intel.cdfScalar o galileo100.intel.ECrad : uno script di compilazione SIMC
 - module_switcher: uno script ...
-Questi due files vanno copiati nella subdir "config/cineca", che dovrebbe già essere presente e contenente alcuni files (e.g.:
+Questi due files vanno copiati nella subdir "config/cineca", che dovrebbe già essere presente e contenente alcuni files (leo.cpu.nvhpc,leo.gpu.nvhpc,leo.common.nvhpc-23.1,leo.cpu.nvhpc-23.1,leo.gpu.nvhpc-23.1)
+ATTENZIONE: i files potrebbero essere torvati solo se autenticati con l'utente opertivo (login05).
 ```
 $ mkdir -p config/cineca
 # Eseguo il primo script
