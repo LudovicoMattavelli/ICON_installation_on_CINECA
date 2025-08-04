@@ -258,15 +258,15 @@ $ module load netcdf-fortran/4.5.3--intel--2021.4.0
 
 # Compressione e codifica
 $ module load szip/2.1.1--oneapi--2021.2.0-ifort
-$ module load eccodes/2.21.0--intelmpi--oneapi-2021--binary
-ERROR: Unable to locate a modulefile for 'eccodes/2.21.0--intelmpi--oneapi-2021--binary'
-# Giusto perchè non ho MPI al momento
 $ module load eccodes/2.21.0--intel--2021.4.0
 # Librerie matematiche
 $ module load mkl/oneapi-2021--binary
 
 ```
-
+Può essere conveniente inserire lo script precedente all'interno di un file env_my_icon.sh. In questo modo ogni volta per caricare i moduli basterà fare
+```
+$ source env_my_icon.sh
+```
 
 
 **Set di Moduli Alternativi (GNU Compiler)(NON TESTATO):**
@@ -298,11 +298,11 @@ Caratteristiche:
 - Compatibilità con HDF5 per file di grandi dimensioni
 - Interfacce C e Fortran
 
-Inoltre, è importante che NetCDF lavori in parallelo. Se ogni processo scrivesse su un file separato o attendesse il proprio turno per scrivere (lettura/scrittura) seriale, sarebbe inefficiente e lento.
+Inoltre, è importante che NetCDF lavori in parallelo. Se ogni processo scrivesse su un file separato o attendesse il proprio turno per scrivere (lettura/scrittura) seriale, meno efficiente e più lento.
+ICON non usa (credo) MPI per questa libreria e di conseguenza anche per le successive.
 
 Il supporto MPI-IO permette a più processi contemporaneamente di leggere/scrivere sullo stesso file NetCDF in modo coordinato. Questo si chiama I/O parallelo.
 
-(COME SCARICARLA? CHIEDO PRIMA CONFERMA A DAVIDE)
 
 **HDF5 (Hierarchical Data Format 5)(DA SISTEMARE):**
 Formato di file gerarchico per dati scientifici di grandi dimensioni.
@@ -321,7 +321,7 @@ Se il workflow di ICON usa GRIB principalmente in modo seriale o solo da pochi p
 Se invece è previsto un I/O parallelo intensivo su GRIB, conviene la versione MPI-aware. 
 Per la maggior parte degli usi (come preprocessing GRIB per ICON), la versione seriale è sufficiente.
 
-All'interno di icon è già presente ecCodes ma senza MIP. Per verificarlo:
+All'interno di icon è già presente ecCodes, senza MIP. Per verificarlo:
 ```bash
 # Cerco i moduli di ecCodes
 $ grep -i eccodes
@@ -332,23 +332,5 @@ eccodes/2.21.0--intel--2021.4.0              ninja/1.11.1
 $ module load eccodes/2.21.0--intel--2021.4.0
 $ ldd $(which grib_ls) | grep mpi
 
-# Se non trovo riferimenti a libmpi o libmpiifort, è seriale. (è non li trovo)
-
-```
-
-Se vuoi scaricare la versione MPI (NON CREDO CHE QUESTO QUA SOTTO BASTI!)
-Installazione e configurazione:
-```bash
-# Download da ECMWF
-wget https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.21.0-Source.tar.gz
-
-# Configurazione build
-./configure --prefix=/path/to/install \
-            --disable-jpeg \
-            --enable-shared=no \
-            --enable-fortran
-
-# Compilazione
-make -j8
-make install
+# Se non trovo riferimenti a libmpi o libmpiifort, è seriale.
 ```
