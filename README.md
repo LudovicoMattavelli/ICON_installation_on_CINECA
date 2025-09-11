@@ -90,6 +90,7 @@ $ eval "$(ssh-agent -s)"
 
 #You can setup and configure ssh-agent on your machine in order to unlock your ssh passphrases just once per computer session
 $ ssh-add ~/.ssh/id_ed25519_gitlab.dkrz.de
+(Da fare altrimenti devo mettere la password per ogni repository scaricata durante il git clone)
 ```
 
 **Configurazione SSH Config:**
@@ -123,7 +124,7 @@ Welcome to GitLab, @number_user!
 
 Il sistema G100 utilizza profili moduli per organizzare il software disponibile. Per ICON è necessario attivare profili specifici.
 
-**Attivazione Profili Necessari:**
+**Attivazione Profili Necessari:** PROVO SENZA
 ```bash
 # Lista profili disponibili
 $ modmap --all
@@ -140,7 +141,7 @@ $ module avail
 
 ---
 
-## 2. Gestione Dipendenze e Librerie (DA VERIFICARE)
+## 2. Gestione Dipendenze e Librerie (DA VERIFICARE) PROVO SENZA
 From "ICON indofrm.docx", cap:"Compilazion Icon su Cineca" by eminguz
 [ICON inform](https://docs.google.com/document/d/1EUSS5lHaqZmkv0PiUGr1d75ei0EuMAR_/edit)
 ### 2.1 Introduzione a SPACK (Build System)
@@ -340,7 +341,7 @@ Questo garantisce che: tutti i riferimenti ai branch remoti siano disponibili, i
 A questo punto:
 ```
 # Aggiorna i submodule
-git submodule update --init --recursive
+git submodule update --init --recursive (serve davvero?)
 
 # Verifica dove ti trovi e su che branch sei:
 git branch
@@ -350,10 +351,11 @@ Controlla che la struttura sia corretta per la build, es. cartelle come src/, ex
 Restando nella cartella icon-nwp, devo ora inserire due scrpit all'interno del file prima di poterlo compliare:
 - galileo.intel.cdfScalar o galileo100.intel.ECrad : uno script di compilazione SIMC
 - module_switcher: uno script ...
+Entrambi li posso trovare dentro smr_prod/lami/srcintel/icon-2025.04-1/config/cineca
 Questi due files vanno copiati nella subdir "config/cineca", che dovrebbe già essere presente e contenente alcuni files (leo.cpu.nvhpc,leo.gpu.nvhpc,leo.common.nvhpc-23.1,leo.cpu.nvhpc-23.1,leo.gpu.nvhpc-23.1)
 ATTENZIONE: i files potrebbero essere torvati solo se autenticati con l'utente opertivo (login05).
 ```
-$ mkdir -p config/cineca
+###$ mkdir -p config/cineca
 # Eseguo il primo script
 $ ./config/cineca/galileo...
 # Compilo (il semplice make sarebbe lentissimo)
