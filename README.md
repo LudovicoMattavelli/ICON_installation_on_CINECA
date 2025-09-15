@@ -356,9 +356,56 @@ Questi due files vanno copiati nella subdir "config/cineca", che dovrebbe già e
 ATTENZIONE: i files potrebbero essere torvati solo se autenticati con l'utente opertivo (login05).
 ```
 ###$ mkdir -p config/cineca
-# Eseguo il primo script
-$ ./config/cineca/galileo...
+# dalla root dir del git, eseguire il primo file
+$ ./config/cineca/galileo100.intel.ECrad
+#patch 19/09/2023: lanciare module load cmake, altrimenti usa una versione troppo vecchia
+
 # Compilo (il semplice make sarebbe lentissimo)
 $ make -j 8
 ```
+(domanda: con module switcher non devo fare nulla?)
 A questo punto si troverà l’eseguibile icon è nella subdir bin.
+## 4. Compilazione ecflow e nwprun
+
+NWPRUN E NWPCONF
+cd $WORK
+mkdir antonio
+cd antonio
+Fare il git clone di 'nwprun' e 'nwpconf':
+git clone https://github.com/ARPA-SIMC/nwprun.git
+git clone https://github.com/ARPA-SIMC/nwpconf.git
+Per installare nwpconf in nwprun bisogna:
+- entrare nella cartella nwpconf
+- autoreconf -if (se non esiste il configure)
+- ./configure --prefix=/path/to/nwprun
+- make install
+
+ECFLOW
+Opzione 1: scaricare il tutto (vedi app ItaliaMeteo)
+Opzione 2:
+srcgnu da copiare da smr_prod/lami/ (non si riuscirà a copiare tutto, ma è suff avere le cartelle ecflow, install e forse boost_1_71_0[che per ora non ho copiato in quanto troppo pesante])
+
+POI
+In ~/.bash_profile sono definiti:
+- export ECF_HOST=login05              --> il nodo da cui devo usare ecflow [export ECF_HOST=login01.leonardo.local]
+- export ECF_PORT=30890                --> valore è univoco per l'utente. Lo trovi la 
+                                    prima volta che lanci il server con 
+                                    ./ec_wrap ecflow_start.sh (non chiaro. La prima volta esce un numero troppo grande)
+- export ECF_PASSWD=$HOME/.ecf_passwd  --> file che deve esserci per default in cui sono 
+                                    definiti node, port e una password (va bene 
+                                    una qualsiasi)
+- export WORKDIR_BASE=$WORK/thomas     
+- export OPE=$WORKDIR_BASE/nwprun
+
+# <user> <host> <port> <passwd>
+tgastald login05 30890 Catenelle
+tgastald login04 30890 Catenelle
+Modificare i permessi in: chmod 600 $HOME/.ecf_passwd
+
+in ec_wrap
+g100 | leonardo ) # Cineca HPC Galileo 100
+        export PATH=/ind2/meteo/a07smr03/lami/srcgnu/install/bin:$PATH
+        export PYTHONPATH=/ind2/meteo/a07smr03/lami/srcgnu/install/lib/python3.6/site-packages
+        (per leonardo il path è /leonardo_work/smr_prod/lami...)
+
+
