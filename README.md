@@ -340,8 +340,8 @@ Questo garantisce che: tutti i riferimenti ai branch remoti siano disponibili, i
 
 A questo punto:
 ```
-# Aggiorna i submodule
-git submodule update --init --recursive (serve davvero?)
+# Aggiorna i submodule (serve perchè ogni sottomodulo è specifico della versione del branch che sto usando)
+git submodule update --init --recursive 
 
 # Verifica dove ti trovi e su che branch sei:
 git branch
@@ -356,6 +356,9 @@ Questi due files vanno copiati nella subdir "config/cineca", che dovrebbe già e
 ATTENZIONE: i files potrebbero essere torvati solo se autenticati con l'utente opertivo (login05).
 ```
 ###$ mkdir -p config/cineca
+# Per semplicità si possono prendere da una vecchia versione di Icon
+$ cp $WORKDIR_BASEK/srcinte/icon-nwp_terra-urb-2025-07-06/config/cineca/module_switcher config/cineca/.
+$ cp $WORKDIR_BASEK/srcinte/icon-nwp_terra-urb-2025-07-06/config/cineca/galileo100.intel.ECrad config/cineca/.
 # dalla root dir del git, eseguire il primo file
 $ ./config/cineca/galileo100.intel.ECrad
 #patch 19/09/2023: lanciare module load cmake, altrimenti usa una versione troppo vecchia
@@ -365,6 +368,28 @@ $ make -j 8
 ```
 (domanda: con module switcher non devo fare nulla?)
 A questo punto si troverà l’eseguibile icon è nella subdir bin.
+
+Se voglio ricompilare Icon, mi basterà effettuare
+```
+$ make clean
+# E forse fare rm -rf bin/*
+```
+
+Se invece voglio spostrmi ad una versione più vecchia:
+```
+# Vedi cronologia e trova il commit desiderato
+$ git log --oneline --graph --decorate
+
+# Torna a un commit specifico
+$ git checkout <commit-id>
+
+# Riallinea i submodule
+$ git submodule update --init --recursive
+
+# Se voglio tenerlo come un branch locale 
+$ git checkout -b vecchia_versione
+```
+
 ## 4. Compilazione ecflow e nwprun
 
 NWPRUN E NWPCONF
